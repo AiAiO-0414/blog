@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./assets/layui/css/layui.css">
+    <link rel="stylesheet" href="./assets/css/login.css">
+</head>
+
+<body>
+    <div class="login">
+        <h1>小猪博客注册系统</h1>
+        <form action="/add" method="POST">
+            <input type="text" name="name" placeholder="Username" id="name" />
+            <input type="password" name="password" placeholder="Password" id="password" />
+            <button type="submit" id="loginBtn" class="btn btn-primary btn-block btn-large">点击注册</button>
+        </form>
+    </div>
+</body>
+<script src="./assets/js/jquery.min.js"></script>
+<script src="./assets/layui/layui.js"></script>
+<script>
+
+    $("#loginBtn").on('click', () => {
+
+
+        $.ajax({
+            type: 'post',
+            url: 'http://127.0.0.1:3000/add',
+            data: {
+                name: $('#name').val(),
+                password:$('#password').val()
+            },
+            success: function () {
+                layer.msg('login')
+                 location.href = './login'
+            }
+        })
+        console.log($('#password').val());
+        return false;
+    })
+</script>
+
+</html>
