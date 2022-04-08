@@ -1,12 +1,13 @@
 const path = require('path');
-const { password } = require('../config/dbconfig.js');
+// const { password } = require('../config/dbconfig.js');
 const controller = {};
 
 // 导入模型
 const pathDir = path.join(path.dirname(__dirname), 'views')
 const query = require('../model/query.js')
 controller.index = (req, res) => {
-    res.sendFile(`${pathDir}/index.html`)
+    // res.sendFile(`${pathDir}/index.html`)
+    res.render('index.html'); 
     // const sql = `select * from article`
     // let rows = await query(sql)
     // res.json(rows)
