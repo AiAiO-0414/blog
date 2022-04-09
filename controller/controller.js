@@ -65,14 +65,13 @@ controller.add = async (req, res) => {
     let sql1 = ''
     if (username == name) {
         console.log(11);
+        // res.redirect('/register')
+        // return false
         let responseStr = `<script>
-        alert('请输入正确的账号或密码');
-        location.href='/login';
+        alert('该用户名已被占用');
+        location.href='/register';
         </script>`
         res.send(responseStr)
-        return false
-        // let rows = await query(sql)
-        // res.json(rows)
     } else {
         console.log(222);
         sql1 = `insert into users(username,password) values('${name}','${password}')`

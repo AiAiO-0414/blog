@@ -30,15 +30,13 @@
             url: 'http://127.0.0.1:3000/add',
             data: {
                 name: $('#name').val(),
-                password:$('#password').val()
-            },
-            success: function () {
-                layer.msg('login')
-                 location.href = './login'
+                password: $('#password').val()
             }
         })
-        console.log($('#password').val());
-        return false;
+        layer.msg('login')
+        // location.href = './login'
+        // console.log($('#password').val());
+        // return false;
     })
 </script>
 

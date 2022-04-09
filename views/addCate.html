@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../assets/layui/css/layui.css">
+</head>
+
+<body>
+    <form class="layui-form" action="" lay-filter="example" style="margin-top: 50px;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">标题</label>
+            <div class="layui-input-inline">
+                <input type="text" name="cate_name" lay-verify="title" autocomplete="off" placeholder="请输入标题"
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">序列号</label>
+            <div class="layui-input-inline">
+                <input type="text" name="orderBy" lay-verify="title" autocomplete="off" placeholder="请输入序列"
+                    class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+            </div>
+        </div>
+    </form>
+</body>
+<script src="../assets/layui/layui.js"></script>
+<script>
+    layui.use(['form', 'layedit', 'laydate'], function () {
+        var form = layui.form
+            , layer = layui.layer
+            , layedit = layui.layedit
+            , laydate = layui.laydate
+            , $ = layui.$;
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //监听提交
+        form.on('submit(demo1)', function (data) {
+            $.ajax({
+                type: 'post',
+                url: 'http://127.0.0.1:3000/addCateData',
+                data: { data: data.field },
+                success: function () {
+                    layer.msg('添加成功', {
+                        icon: 1,
+                        time: 800
+                    });
+                }
+            })
+            return false;
+        });
+
+    });
+</script>
+
+</html>
