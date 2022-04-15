@@ -94,7 +94,6 @@
           , {
             field: '', title: '内容', templet: (data) => {
               let mydata = JSON.stringify(data)
-              console.log('mydata', mydata)
               return `<a href="javascript:;" onclick='showContent(${mydata})'>查看详情</a>`
             }
           }
@@ -141,7 +140,6 @@
       //监听行工具事件
       table.on('tool(test)', function (obj) {
         var data = obj.data;
-        console.log(data)
         if (obj.event === 'del') {
           layer.confirm('真的删除行么', async function (index) {
             obj.del();
@@ -154,15 +152,7 @@
             layer.msg(message)
           });
         } else if (obj.event === 'edit') {
-          layer.prompt({
-            formType: 2
-            , value: data.email
-          }, function (value, index) {
-            obj.update({
-              email: value
-            });
-            layer.close(index);
-          });
+          location.href = '/editArticle?id=' + data.id
         }
       });
     });

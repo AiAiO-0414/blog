@@ -38,8 +38,11 @@ router.post('/change',controller.change)
 router.get('/article',artController.article);
 router.get('/artData',artController.artData);
 router.get('/addArticle',artController.addArticle);
+router.get('/editArticle',artController.editArticle);
 router.post('/addArtData',artController.addArtData);
 router.post('/delArtData',artController.delArtData);
+router.get('/getEditData',artController.getEditData);
+router.post('/updEditData',artController.updEditData);
 
 
 //后台分类列表

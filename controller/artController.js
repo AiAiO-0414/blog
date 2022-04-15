@@ -12,6 +12,10 @@ artController.addArticle = (req, res) => {
     res.render('addArticle.html');
 }
 
+artController.editArticle = (req, res) => {
+    res.render('editArticle.html');
+}
+
 artController.artData = async (req, res) => {
     //1.接收页码和显示的条数
     const { page, limit } = req.query
@@ -80,23 +84,57 @@ artController.addArtData = async (req, res) => {
 }
 
 artController.delArtData = async (req, res) => {
-    const { id ,pic} = req.body
+    const { id, pic } = req.body
     const sql = `delete from article where id = ${id}`
     const { affectedRows } = await query(sql)
     if (affectedRows > 0) {
-        Pic = path.join(path.dirname(__dirname),`/upload/${pic}`)
-        fs.unlink(Pic,(err)=>{})
+        Pic = path.join(path.dirname(__dirname), `/upload/${pic}`)
+        fs.unlink(Pic, (err) => { })
         res.json({
-            code:0,
-            message:'成功删除'
+            code: 0,
+            message: '成功删除'
         })
-    }else{
+    } else {
         res.json({
-            code:1,
-            message:'删除失败'
+            code: 1,
+            message: '删除失败'
         })
     }
 }
 
+artController.getEditData = async (req, res) => {
+    const { id } = req.query;
+    const sql = `select * from article where id = ${id}`
+    const rows = await query(sql)
+    res.send(rows[0])
+}
+
+artController.updEditData = async (req, res) => {
+    //1.获取参数
+    let { id, title, content, status, cate_id, isPic, oldPic } = req.body;
+    console.log(isPic);
+     let pic = '';
+    let sql;
+    //2.判断是否有上传文x   件
+    if (isPic == 1) {
+        let files = req.files;  //获取上传文件的数据                
+        console.log(files);
+        let { filename, originalname } = files[0];
+        pic = `${files[0].originalname}`
+        Pic = path.join(path.dirname(__dirname), `/upload/${oldPic}`)
+        fs.unlink(Pic, (err) => {})
+        //文件重命名
+        fs.renameSync(path.join(`${path.dirname(__dirname)}/upload/${filename}`), path.join(`${path.dirname(__dirname)}/upload/${originalname}`));
+        sql = `update article set title='${title}',content='${content}',cate_id='${cate_id}',status='${status}', pic='${pic}' where id = ${id} `;
+    } else {
+        sql = `update article set title='${title}',content='${content}',cate_id='${cate_id}',status='${status}' where id = ${id} `;
+    }
+    const { affectedRows } = await query(sql)
+    if (affectedRows > 0) {
+        res.json({ code: 0, message: '更新成功' })
+    } else {
+        res.json({ code: 1, message: '更新失败' })
+    }
+}
 
 module.exports = artController;

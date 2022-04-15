@@ -67,16 +67,13 @@
         , form = layui.form
         , $ = layui.$;
       const result = await $.get('/logoData')
-      console.log(result);
       let logoText = ''
       result.find(item => {
-        console.log(item);
         if (item.name === 'logoText') {
           logoText = item.val;
           return true
         }
       })
-      console.log(logoText);
       $("#logoText").text(logoText)
       localStorage.setItem('logoText', logoText)
 
