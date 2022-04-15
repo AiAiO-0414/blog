@@ -54,7 +54,8 @@ artController.addArtData = async (req, res) => {
     const author = req.session.userInfo.id;
     let pic = ''
     if (req.files) {
-        let files = req.files;  //获取上传文件的数据
+        let files = req.files;  //获取上传文件的数据                
+        console.log(files);
         let { filename, originalname } = files[0];
         pic = `${files[0].originalname}`
         //文件重命名

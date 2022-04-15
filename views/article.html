@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -8,7 +7,6 @@
   <link rel="stylesheet" href="./assets/layui/css/layui.css">
   <link rel="stylesheet" href="/assets/css/lightbox.min.css">
 </head>
-
 <body>
   <div class="layui-layout layui-layout-admin">
     {{include "./common/header.html" }}
@@ -20,7 +18,6 @@
         <table class="layui-hide" id="test" lay-filter="test"></table>
       </div>
     </div>
-
     <!-- 操作的模板 -->
     <script type="text/html" id="barDemo">
   <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
@@ -57,6 +54,25 @@
   //   });
   // </script>
   <script>
+    // 弹窗显示内容
+    function showContent(data) {
+      let { title, content, username, add_date } = data;
+      content = `<div style="padding:30px">
+        <div style="margin:10px;font-size:10px;color:#0062ad"><b>发布者:${username}</b></div>
+        ${content}
+        <div><span style="font-size:10px;float:right;margin:20px">发布时间:${add_date}</span></div>
+      </div>`
+      //页面层
+      layer.open({
+        title,
+        content,
+        type: 1,
+        // skin: 'layui-layer-rim', //加上边框
+        area: ['520px', '540px'], //宽高
+
+      });
+    }
+
     layui.use('table', function (obj) {
       var table = layui.table;
       table.render({
@@ -74,7 +90,14 @@
       </a>`
             }
           }
-          , { field: 'content', title: '内容' }
+          // , { field: 'content', title: '内容' }
+          , {
+            field: '', title: '内容', templet: (data) => {
+              let mydata = JSON.stringify(data)
+              console.log('mydata', mydata)
+              return `<a href="javascript:;" onclick='showContent(${mydata})'>查看详情</a>`
+            }
+          }
           , { field: 'username', title: '发布者', sort: true }
           , { field: 'statusText', title: '状态', }
           , { field: 'add_date', title: '添加时间' }
@@ -122,8 +145,8 @@
         if (obj.event === 'del') {
           layer.confirm('真的删除行么', async function (index) {
             obj.del();
-            const { id ,pic } = data
-            const { code, message } = await $.post('/delArtData', { id,pic })
+            const { id, pic } = data
+            const { code, message } = await $.post('/delArtData', { id, pic })
             if (code === 0) {
               // 重载当前表格
               table.reload('test')
