@@ -8,7 +8,8 @@ classifyController.classify = (req, res) => {
 }
 
 classifyController.addCate = async(req,res) =>{
-    res.sendFile(path.join(__dirname,'../views/addCate.html'))
+    res.render('addCate.html');
+    // res.sendFile(path.join(__dirname,'../views/addCate.html'))
 }
 
 //获取分类的接口数据
@@ -46,6 +47,17 @@ classifyController.addCateData = async (req, res) => {
     res.json(rows)
 }
 
+classifyController.getCount = async (req,res) => {
+    const sql = 'select count(t1.id) total,t2.cate_name  from article t1 left join category t2 on t1.cate_id = t2.cate_id group by t1.cate_id';
+    let result = await query(sql)
+    result = result.map(item => {
+        if (!item.cate_name) {
+            item.cate_name = '未分类'
+        }
+        return item;
+    })
+    res.json(result)
+}
 
 
 module.exports = classifyController;

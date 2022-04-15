@@ -1,40 +1,260 @@
-<div class="layui-header">
-    <div class="layui-logo layui-hide-xs layui-bg-black">小猪博客管理系统</div>
-    <!-- 头部区域（可配合layui 已有的水平导航） -->
-    <ul class="layui-nav layui-layout-left">
-      <!-- 移动端显示 -->
-      <li class="layui-nav-item layui-show-xs-inline-block layui-hide-sm" lay-header-event="menuLeft">
-        <i class="layui-icon layui-icon-spread-left"></i>
-      </li>
-      <li class="layui-nav-item layui-hide-xs"><a href="">nav 1</a></li>
-      <li class="layui-nav-item layui-hide-xs"><a href="">nav 2</a></li>
-      <li class="layui-nav-item layui-hide-xs"><a href="">nav 3</a></li>
-      <li class="layui-nav-item">
-        <a href="javascript:;">nav groups</a>
-        <dl class="layui-nav-child">
-          <dd><a href="">menu 11</a></dd>
-          <dd><a href="">menu 22</a></dd>
-          <dd><a href="">menu 33</a></dd>
-        </dl>
-      </li>
-    </ul>
-    <ul class="layui-nav layui-layout-right">
-      <li class="layui-nav-item layui-hide layui-show-md-inline-block">
-        <a href="javascript:;">
-          <img src="https://img0.baidu.com/it/u=2079451736,897757013&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500"  class="layui-nav-img">
-        </a>
-        <dl class="layui-nav-child">
-          <dd><a href="">个人信息</a></dd>
-          <dd><a href="">修改密码</a></dd>
-          <dd><a href="./login">退出</a></dd>
-        </dl>
-      </li>
-      <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
-        <a href="javascript:;">
-          <i class="layui-icon layui-icon-more-vertical"></i>
-        </a>
-      </li>
-    </ul>
-  </div>
-  
-  
+<div class="layui-header" id="bcg">
+  <div class="layui-logo layui-hide-xs" id="logoText" style="color: #fff; border:none;">小猪博客管理系统</div>
+  <!-- 头部区域（可配合layui 已有的水平导航） -->
+  <ul class="layui-nav layui-layout-right">
+    <li class="layui-nav-item layui-hide layui-show-md-inline-block">
+      <a href="javascript:;">
+        <img id="avatar" src=""
+          class="layui-nav-img">
+        <span id="username"></span>
+      </a>
+      <dl class="layui-nav-child">
+        <dd><a href="javascript:;" id="showUserInfo">个人信息</a></dd>
+        <dd><a href="javascript:;" id="changePass">修改密码</a></dd>
+        <dd><a id="logout" href="javascript:;">退出</a></dd>
+      </dl>
+    </li>
+    <li class="layui-nav-item" lay-header-event="menuRight" lay-unselect>
+      <a href="javascript:;">
+        <i class="layui-icon layui-icon-more-vertical"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+<script src="./assets/layui/layui.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+<script>
+  // 获取cookie设置到header页面中，显示用户的信息
+  let {
+    id,
+    username,
+    intro,
+    avatar,
+    password
+  } = JSON.parse(Cookies.get('userInfo'))
+  $('#username').html(username)
+  $('#avatar').attr('src', `upload/${avatar}`)
+
+  let logoText = localStorage.getItem('logoText')
+  $("#logoText").text(logoText)
+  let colors = Cookies.get('colors')
+  //主题换肤
+  window.onload = function () {
+    if (colors) {
+      $('#test-form-input').val(colors);
+      $('#bcg').css('backgroundColor', colors)
+      $('#bck').css('backgroundColor', colors)
+      $('#logoText').css('backgroundColor', colors)
+      $('#side').css('backgroundColor', colors)
+    }
+  }
+
+  $('#logout').on('click', async (event) => {
+    const { code } = await $.post('/logout')
+    if (code == 0) {
+      location.href = '/login'
+    } else {
+      layer.msg('退出失败')
+    }
+  })
+
+
+  layui.use(['element', 'layer', 'util', 'form', 'upload'], async function () {
+      var element = layui.element
+        , layer = layui.layer
+        , util = layui.util
+        , form = layui.form
+        , $ = layui.$;
+      const result = await $.get('/logoData')
+      console.log(result);
+      let logoText = ''
+      result.find(item => {
+        console.log(item);
+        if (item.name === 'logoText') {
+          logoText = item.val;
+          return true
+        }
+      })
+      console.log(logoText);
+      $("#logoText").text(logoText)
+      localStorage.setItem('logoText', logoText)
+
+      //个人信息
+      $('#showUserInfo').on('click', () => {
+        let style = `
+        <div class="layui-form-item">
+          <label class="layui-form-label">用户名</label>
+          <div class="layui-input-block">
+            <input type="text" name="username" lay-verify="title" disabled value='${username}' autocomplete="off"  class="layui-input">
+          </div>
+        </div>  
+        <label class="layui-form-label">你的美照</label>
+          <div>
+            <div class="layui-upload">
+              <button type="button" class="layui-btn" id="test1">上传图片</button>
+              <div style="margin-left:107px" class="layui-upload-list">
+                <img style="width:100px;height:100px" class="layui-upload-img" id="demo1">
+                <p id="demoText"></p>
+              </div>
+              <div style="width:100px;margin-left: 108px;">
+                <div class="layui-progress layui-progress-big" lay-showpercent="yes" lay-filter="demo">
+                  <div class="layui-progress-bar" lay-percent=""></div>
+                </div>
+              </div>
+          </div>   
+            <a name="list-progress"> </a>
+            <div style="margin-top: 10px;">  
+          </div>
+
+        <div class="layui-form-item layui-form-text">
+          <label class="layui-form-label">个人介绍 </label>
+          <div class="layui-input-block">
+            <textarea placeholder="请输入内容" id="area" class="layui-textarea" name="desc">${intro}</textarea>
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button type="submit" class="layui-btn" lay-submit="" id="demo" lay-filter="demo3">立即提交</button>
+          </div>
+        </div>
+      `
+        var upload = layer.upload
+        layer.open({
+          type: 1,
+          skin: 'layui-layer-rim', //加上边框
+          area: ['420px', '540px'], //宽高
+          content: style,
+          success: function () {
+            uploadAvatar()
+            let {
+              avatar
+            } = JSON.parse(Cookies.get('userInfo'));
+            $("#demo1").attr('src', `upload/${avatar}`)
+          }
+        });
+
+        function uploadAvatar() {
+          const upload = layui.upload;
+          const element = layui.element;
+          var uploadInst = upload.render({
+            elem: '#test1'
+            , url: '/upAvatar'
+            , before: function (obj) {
+              //预读本地文件示例，不支持ie8
+              obj.preview(function (index, file, result) {
+                $('#demo1').attr('src', result); //图片链接（base64）
+              });
+
+              element.progress('demo', '0%'); //进度条复位
+              layer.msg('上传中', { icon: 16, time: 0 });
+            }
+            , done: function (res) {
+              //如果上传失败
+              if (res.code === 0) {
+                let {
+                  avatar
+                } = JSON.parse(Cookies.get('userInfo'));
+                $("#avatar").attr('src', `upload/${avatar}`)
+                return layer.msg('上传成功');
+              }
+            }
+            , error: function () {
+              //演示失败状态，并实现重传
+              var demoText = $('#demoText');
+              demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+              demoText.find('.demo-reload').on('click', function () {
+                uploadInst.upload();
+              });
+            }
+            //进度条
+            , progress: function (n, elem, e) {
+              element.progress('demo', n + '%'); //可配合 layui 进度条元素使用
+              if (n == 100) {
+                layer.msg('上传完毕', { icon: 1 });
+              }
+            }
+          });
+        }
+
+        $(document).on('click', '#demo', async () => {
+          const intro = $("textarea[name='desc']").val()
+          const {
+            code,
+            message
+          } = await $.post('/updUserInfo', {
+            id,
+            intro
+          })
+          if (code === 0) {
+            layer.msg(message, {
+              icon: 1
+            })
+          } else {
+            layer.msg(message, {
+              icon: 2
+            })
+          }
+        })
+      })
+
+
+      //修改密码
+      $('#changePass').on('click', () => {
+        let style = `
+        <div class="layui-form-item">
+          <label class="layui-form-label">原始密码</label>
+          <div class="layui-input-block">
+            <input type="text" name="username" lay-verify="title" id="old" autocomplete="off"  class="layui-input">
+          </div>
+        </div> 
+        <div class="layui-form-item">
+          <label class="layui-form-label">新密码</label>
+          <div class="layui-input-block">
+            <input type="text" name="username" lay-verify="title" id="new"  autocomplete="off"  class="layui-input">
+          </div>
+        </div> 
+        <div class="layui-form-item">
+          <label class="layui-form-label">确认密码</label>
+          <div class="layui-input-block">
+            <input type="text" name="username" lay-verify="title" id="new2"  autocomplete="off"  class="layui-input">
+          </div>
+        </div> 
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <button type="submit" class="layui-btn" lay-submit="" id="change" lay-filter="demo2">确认修改</button>
+          </div>
+        </div>
+        `
+        layer.open({
+          title: '修改密码页面',
+          type: 1,
+          skin: 'layui-layer-rim', //加上边框
+          area: ['420px', '440px'], //宽高
+          content: style
+        });
+      })
+      $(document).on('click', '#change', async () => {
+        console.log($('#old'));
+        const {
+          code,
+          message
+        } = await $.post('/change', {
+          id,
+          password,
+          old: $('#old').val(),
+          news: $('#new').val(),
+          news2: $('#new2').val()
+        })
+        if (code === 0) {
+          layer.msg(message, {
+            icon: 1
+          })
+        } else {
+          layer.msg(message, {
+            icon: 2
+          })
+        }
+      })
+    });
+</script>

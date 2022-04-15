@@ -7,7 +7,6 @@
   <title>德德后台管理系统</title>
   <link rel="stylesheet" href="./assets/layui/css/layui.css">
 </head>
-
 <body>
   <div class="layui-layout layui-layout-admin">
     {{include "./common/header.html" }}
@@ -15,34 +14,46 @@
     <div class="layui-body">
       <!-- 内容主体区域 -->
       <div style="padding: 15px;">
-        <table class="layui-table" id="cate" lay-filter="cate">
+        <div style="padding: 15px;">
+          <table class="layui-table" id="cate" lay-filter="cate">
+        </div>
       </div>
+      <div style="margin-left: 30px;">
+        <h3 style="margin-bottom: 10px;">主题换肤</h3>
+        <form class="layui-form" action="" id="formColor">
+          <div class="layui-form-item">
+            <div class="layui-input-inline" style="width: 120px;">
+              <input type="text" value="" placeholder="请选择颜色" class="layui-input" id="test-form-input">
+            </div>
+            <div class="layui-inline" style="left: -11px;">
+              <div id="test-form"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+
     </div>
-    <script type="text/html" id="toolbarDemo">
-      <div class="layui-btn-container">
-        <button class="layui-btn layui-btn-sm" lay-event="add">添加</button>
-      </div>
-    </script>
   </div>
   <script src="./assets/layui/layui.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
   <script>
-    layui.use('table', function () {
+    layui.use(['table', 'form', 'colorpicker'], function () {
       var table = layui.table;
+      var form = layui.form;
+      var colorpicker = layui.colorpicker;
       var $ = layui.jquery;
       table.render({
         elem: '#cate'
-        , url: '/cateData'
-        , toolbar: '#toolbarDemo'//开启头部工具栏，并为其绑定左侧模板
+        , url: '/sysData'
         , cellMinWidth: 80
         , cols: [[
-          { field: 'cate_id', width: 80, title: '序号', sort: true }
-          , { field: 'cate_name', width: 100, edit: 'text', title: '分类名称' }
-          , { field: 'orderBy', width: 80, edit: 'text', title: '排序', sort: true }
+          { field: 'id', width: 80, title: '序号', sort: true }
+          , { field: 'val', width: 150, edit: 'text', title: 'XX博客' }
           , {
             fixed: "right", width: 150, title: '操作', templet: (obj) => {
               return `
-          <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" id='del'>删除</a>
-          `
+        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" id='del'>删除</a>
+        `
             }
           }
         ]]
@@ -50,7 +61,7 @@
       //监听单元格编辑
       table.on('edit(cate)', async function (obj) {
         const { data } = obj;
-        const { code, message } = await $.post('/updCateData', data)
+        const { code, message } = await $.post('/updSysData', data)
         if (code === 0) {
           layer.msg(message)
         }
@@ -59,17 +70,15 @@
       //监听单元格删除
       table.on('tool(cate)', function (obj) { //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
         const { data } = obj; //获得当前行数据
-        console.log(data);
-        const id = data.cate_id; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
-        console.log(id);
+        console.log(data.id);
         layer.confirm('确定删除吗？', {
           btn: ['确定', '取消'] //按钮
         }, async function () {
           obj.del();
           $.ajax({
             type: 'get',
-            url: `http://127.0.0.1:3000/delCateData`,
-            data: { data: data.cate_id }
+            url: `http://127.0.0.1:3000/delSysData`,
+            data: { data: data.id }
           })
           layer.msg('删除成功', {
             icon: 1,
@@ -81,12 +90,14 @@
           });
         });
       })
-
-      //add事件
-      table.on('toolbar(cate)', function (obj) {
-        location.href = '/addCate'
+      colorpicker.render({
+        elem: '#test-form'
+        , color: '#1c97f5'
+        , done: function (color) {
+          $('#test-form-input').val(color);
+          Cookies.set('colors', color, { expires: 365 })
+          console.log(color);
+        }
       });
     });
   </script>
-</body>
-</html>

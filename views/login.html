@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,22 +9,96 @@
     <link rel="stylesheet" href="./assets/layui/css/layui.css">
     <link rel="stylesheet" href="./assets/css/login.css">
 </head>
+
 <body>
     <div class="login">
         <h1>小猪博客登录系统</h1>
-        <form action="/userLogin" method="post">
-            <input type="text" name="username" placeholder="Username"/>
-            <input type="password" name="password" placeholder="Password"/>
-            <button type="submit" id="loginBtn" class="btn btn-primary btn-block btn-large">Login In</button>
-        </form>
-    </div>
+        <div style="margin-top: 10px;">
+            <form action="/userLogin" method="post">
+                <input type="text" name="names" placeholder="Username" id="names" />
+                <input type="password" name="password" placeholder="Password" id="pass" />
+                <button type="submit" id="loginBtn" class="btn btn-primary btn-block btn-large">Login In</button>
+            </form>
+            <button type="submit" id="loginBtn2" class="btn btn-primary btn-block btn-large">注册</button>
+        </div>
 </body>
 <script src="./assets/js/jquery.min.js"></script>
 <script src="./assets/layui/layui.js"></script>
 <script>
-    $("#loginBtn").on('click',()=>{
-        layer.msg('login')
-        // return false;
+    let names = document.getElementById('names')
+    let pass = document.getElementById('pass')
+    $("#loginBtn").on('click', () => {
+        $.ajax({
+            type: 'post',
+            url: 'http://127.0.0.1:3000/userLogin',
+            data: {
+                username: $('#names').val(),
+                password: $('#pass').val()
+            }
+        }).then(res => {
+            let { code, message } = res
+            if (code === 0) {
+                console.log(222);
+                layer.msg(message, { icon: 1 })
+                setTimeout(() => {
+                    location.href = './index'
+                }, 800)
+            } else {
+                layer.msg(message, { icon: 2 })
+            }
+        })
+        return false
+    })
+    $("#loginBtn2").on('click', () => {
+        location.href = '/register'
     })
 </script>
+<script>
+    layui.use(['upload', 'element', 'layer'], function () {
+        var $ = layui.jquery
+            , upload = layui.upload
+            , element = layui.element
+            , layer = layui.layer;
+
+        //常规使用 - 普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test1'
+            , url: 'https://httpbin.org/post' //此处用的是第三方的 http 请求演示，实际使用时改成您自己的上传接口即可。
+            , before: function (obj) {
+                //预读本地文件示例，不支持ie8
+                obj.preview(function (index, file, result) {
+                    $('#demo1').attr('src', result); //图片链接（base64）
+                });
+
+                element.progress('demo', '0%'); //进度条复位
+                layer.msg('上传中', { icon: 16, time: 0 });
+            }
+            , done: function (res) {
+                //如果上传失败
+                if (res.code > 0) {
+                    return layer.msg('上传失败');
+                }
+                //上传成功的一些操作
+                //……
+                $('#demoText').html(''); //置空上传失败的状态
+            }
+            , error: function () {
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function () {
+                    uploadInst.upload();
+                });
+            }
+            //进度条
+            , progress: function (n, elem, e) {
+                element.progress('demo', n + '%'); //可配合 layui 进度条元素使用
+                if (n == 100) {
+                    layer.msg('上传完毕', { icon: 1 });
+                }
+            }
+        });
+    })
+</script>
+
 </html>

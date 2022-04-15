@@ -12,23 +12,26 @@
 
 <body>
     <div class="login">
-        <h1>小猪博客注册系统</h1>
-        <form action="/add" method="POST">
-            <input type="text" name="name" placeholder="Username" id="name" />
+        <h1>小猪博客修改密码系统</h1>
+        <form action="/change" method="POST">
+            <input type="text" name="name" placeholder="Username" id="names" />
             <input type="password" name="password" placeholder="Password" id="password" />
-            <button type="submit" id="loginBtn" class="btn btn-primary btn-block btn-large">点击注册</button>
+            <button type="submit" id="loginBtn" class="btn btn-primary btn-block btn-large">点击修改</button>
         </form>
     </div>
 </body>
 <script src="./assets/js/jquery.min.js"></script>
 <script src="./assets/layui/layui.js"></script>
 <script>
-    $("#loginBtn").on('click', () => {
+    let names = document.getElementById('names')
+      console.log(document.getElementById('names').value);
+    $("#changePass").on('click', function(){
+    // return false
         $.ajax({
             type: 'post',
-            url: 'http://127.0.0.1:3000/add',
+            url: 'http://127.0.0.1:3000/change',
             data: {
-                name: $('#name').val(),
+                names: $('#names').val(),
                 password: $('#password').val()
             }
         }).then(res => {
@@ -46,5 +49,4 @@
         return false;
     })
 </script>
-
 </html>

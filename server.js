@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-const artTemplate = require('art-template'); 
 const express_template = require('express-art-template');
 require('dotenv').config()
 const cookieParser = require('cookie-parser')
@@ -18,9 +17,27 @@ app.use(session({
     secret: "dsu#$^*(&134",  //加密
     cookie: {
         httpOnly: true,
-        maxAge: 60000 * 24, // 设置有效期为24分钟,如果24分钟内访问了,则有效期重新初始化为24分钟。
+        maxAge: 60000 * 240, // 设置有效期为24分钟,如果24分钟内访问了,则有效期重新初始化为24分钟。
     }
 }))
+
+app.use('/assets',express.static(path.join(__dirname,'assets')))
+app.use('/upload',express.static(path.join(__dirname,'upload')))
+
+app.use((req,res,next)=>{
+    let reqPath = req.path
+    const noPath = ['/login','/userLogin','/register','/add']
+    if(noPath.includes(reqPath)){
+        next();   //放行
+    }else{
+        if(req.session.userInfo){
+            next();
+        }else{
+            res.redirect('/login')
+            return
+        }
+    }
+})
 
 //配置模板的路径
 app.set('views', __dirname + '/views/');
@@ -33,7 +50,6 @@ app.set('view engine', 'html');
 const router = require('./router/router.js');
 app.use(router)
 
-app.use('/assets',express.static(path.join(__dirname,'assets')))
 
 app.listen(process.env.PORT,()=>{
     console.log('服务器已启动');
