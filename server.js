@@ -1,10 +1,13 @@
 const express = require('express');
 const path = require('path');
+const cors = require('cors');
 const app = express();
 const express_template = require('express-art-template');
 require('dotenv').config()
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
+const fontRouter = require('./router/fontRouter.js')
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({
     extended: true
@@ -23,6 +26,10 @@ app.use(session({
 
 app.use('/assets',express.static(path.join(__dirname,'assets')))
 app.use('/upload',express.static(path.join(__dirname,'upload')))
+
+
+// 注册前台路由
+app.use('/api', fontRouter)
 
 app.use((req,res,next)=>{
     let reqPath = req.path

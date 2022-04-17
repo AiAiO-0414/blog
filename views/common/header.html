@@ -1,11 +1,17 @@
 <div class="layui-header" id="bcg">
-  <div class="layui-logo layui-hide-xs" id="logoText" style="color: #fff; border:none;">小猪博客管理系统</div>
+  <div style="display: flex; align-items: center;">
+
+    <div class="layui-logo layui-hide-xs" style="color: #fff; border:none;">
+      <img src='' alt="" id="LogoPic" class="layui-nav-img" style="z-index: 52000000;">
+      <span id="logoText"></span>
+    </div>
+  </div>
+
   <!-- 头部区域（可配合layui 已有的水平导航） -->
   <ul class="layui-nav layui-layout-right">
     <li class="layui-nav-item layui-hide layui-show-md-inline-block">
       <a href="javascript:;">
-        <img id="avatar" src=""
-          class="layui-nav-img">
+        <img id="avatar" src="" class="layui-nav-img">
         <span id="username"></span>
       </a>
       <dl class="layui-nav-child">
@@ -31,14 +37,18 @@
     username,
     intro,
     avatar,
-    password
+    password,
   } = JSON.parse(Cookies.get('userInfo'))
   $('#username').html(username)
   $('#avatar').attr('src', `upload/${avatar}`)
 
   let logoText = localStorage.getItem('logoText')
   $("#logoText").text(logoText)
+
   let colors = Cookies.get('colors')
+
+  let logImg = JSON.parse(Cookies.get('logoPic'));
+  $('#LogoPic').attr('src', `upload/${logImg}`);
   //主题换肤
   window.onload = function () {
     if (colors) {
@@ -61,25 +71,25 @@
 
 
   layui.use(['element', 'layer', 'util', 'form', 'upload'], async function () {
-      var element = layui.element
-        , layer = layui.layer
-        , util = layui.util
-        , form = layui.form
-        , $ = layui.$;
-      const result = await $.get('/logoData')
-      let logoText = ''
-      result.find(item => {
-        if (item.name === 'logoText') {
-          logoText = item.val;
-          return true
-        }
-      })
-      $("#logoText").text(logoText)
-      localStorage.setItem('logoText', logoText)
+    var element = layui.element
+      , layer = layui.layer
+      , util = layui.util
+      , form = layui.form
+      , $ = layui.$;
+    const result = await $.get('/logoData')
+    let logoText = ''
+    result.find(item => {
+      if (item.name === 'logoText') {
+        logoText = item.val;
+        return true
+      }
+    })
+    $("#logoText").text(logoText)
+    localStorage.setItem('logoText', logoText)
 
-      //个人信息
-      $('#showUserInfo').on('click', () => {
-        let style = `
+    //个人信息
+    $('#showUserInfo').on('click', () => {
+      let style = `
         <div class="layui-form-item">
           <label class="layui-form-label">用户名</label>
           <div class="layui-input-block">
@@ -116,89 +126,89 @@
           </div>
         </div>
       `
-        var upload = layer.upload
-        layer.open({
-          type: 1,
-          skin: 'layui-layer-rim', //加上边框
-          area: ['420px', '540px'], //宽高
-          content: style,
-          success: function () {
-            uploadAvatar()
-            let {
-              avatar
-            } = JSON.parse(Cookies.get('userInfo'));
-            $("#demo1").attr('src', `upload/${avatar}`)
+      var upload = layer.upload
+      layer.open({
+        type: 1,
+        skin: 'layui-layer-rim', //加上边框
+        area: ['420px', '540px'], //宽高
+        content: style,
+        success: function () {
+          uploadAvatar()
+          let {
+            avatar
+          } = JSON.parse(Cookies.get('userInfo'));
+          $("#demo1").attr('src', `upload/${avatar}`)
+        }
+      });
+
+      function uploadAvatar() {
+        const upload = layui.upload;
+        const element = layui.element;
+        var uploadInst = upload.render({
+          elem: '#test1'
+          , url: '/upAvatar'
+          , before: function (obj) {
+            //预读本地文件示例，不支持ie8
+            obj.preview(function (index, file, result) {
+              $('#demo1').attr('src', result); //图片链接（base64）
+            });
+
+            element.progress('demo', '0%'); //进度条复位
+            layer.msg('上传中', { icon: 16, time: 0 });
+          }
+          , done: function (res) {
+            //如果上传失败
+            if (res.code === 0) {
+              let {
+                avatar
+              } = JSON.parse(Cookies.get('userInfo'));
+              $("#avatar").attr('src', `upload/${avatar}`)
+              return layer.msg('上传成功');
+            }
+          }
+          , error: function () {
+            //演示失败状态，并实现重传
+            var demoText = $('#demoText');
+            demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+            demoText.find('.demo-reload').on('click', function () {
+              uploadInst.upload();
+            });
+          }
+          //进度条
+          , progress: function (n, elem, e) {
+            element.progress('demo', n + '%'); //可配合 layui 进度条元素使用
+            if (n == 100) {
+              layer.msg('上传完毕', { icon: 1 });
+            }
           }
         });
+      }
 
-        function uploadAvatar() {
-          const upload = layui.upload;
-          const element = layui.element;
-          var uploadInst = upload.render({
-            elem: '#test1'
-            , url: '/upAvatar'
-            , before: function (obj) {
-              //预读本地文件示例，不支持ie8
-              obj.preview(function (index, file, result) {
-                $('#demo1').attr('src', result); //图片链接（base64）
-              });
-
-              element.progress('demo', '0%'); //进度条复位
-              layer.msg('上传中', { icon: 16, time: 0 });
-            }
-            , done: function (res) {
-              //如果上传失败
-              if (res.code === 0) {
-                let {
-                  avatar
-                } = JSON.parse(Cookies.get('userInfo'));
-                $("#avatar").attr('src', `upload/${avatar}`)
-                return layer.msg('上传成功');
-              }
-            }
-            , error: function () {
-              //演示失败状态，并实现重传
-              var demoText = $('#demoText');
-              demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
-              demoText.find('.demo-reload').on('click', function () {
-                uploadInst.upload();
-              });
-            }
-            //进度条
-            , progress: function (n, elem, e) {
-              element.progress('demo', n + '%'); //可配合 layui 进度条元素使用
-              if (n == 100) {
-                layer.msg('上传完毕', { icon: 1 });
-              }
-            }
-          });
-        }
-
-        $(document).on('click', '#demo', async () => {
-          const intro = $("textarea[name='desc']").val()
-          const {
-            code,
-            message
-          } = await $.post('/updUserInfo', {
-            id,
-            intro
-          })
-          if (code === 0) {
-            layer.msg(message, {
-              icon: 1
-            })
-          } else {
-            layer.msg(message, {
-              icon: 2
-            })
-          }
+      $(document).on('click', '#demo', async () => {
+        const intro = $("textarea[name='desc']").val()
+        const {
+          code,
+          message
+        } = await $.post('/updUserInfo', {
+          id,
+          intro
         })
+        if (code === 0) {
+          layer.msg(message, {
+            icon: 1
+          })
+        } else {
+          layer.msg(message, {
+            icon: 2
+          })
+        }
       })
+    })
 
 
-      //修改密码
-      $('#changePass').on('click', () => {
-        let style = `
+    //修改密码
+    $('#changePass').on('click', () => {
+      let style = `
         <div class="layui-form-item">
           <label class="layui-form-label">原始密码</label>
           <div class="layui-input-block">
@@ -223,35 +233,58 @@
           </div>
         </div>
         `
-        layer.open({
-          title: '修改密码页面',
-          type: 1,
-          skin: 'layui-layer-rim', //加上边框
-          area: ['420px', '440px'], //宽高
-          content: style
-        });
+      layer.open({
+        title: '修改密码页面',
+        type: 1,
+        skin: 'layui-layer-rim', //加上边框
+        area: ['420px', '440px'], //宽高
+        content: style
+      });
+    })
+    $(document).on('click', '#change', async () => {
+      console.log($('#old'));
+      const {
+        code,
+        message
+      } = await $.post('/change', {
+        id,
+        password,
+        old: $('#old').val(),
+        news: $('#new').val(),
+        news2: $('#new2').val()
       })
-      $(document).on('click', '#change', async () => {
-        console.log($('#old'));
-        const {
-          code,
-          message
-        } = await $.post('/change', {
-          id,
-          password,
-          old: $('#old').val(),
-          news: $('#new').val(),
-          news2: $('#new2').val()
+      if (code === 0) {
+        layer.msg(message, {
+          icon: 1
         })
-        if (code === 0) {
-          layer.msg(message, {
-            icon: 1
-          })
-        } else {
-          layer.msg(message, {
-            icon: 2
-          })
-        }
+      } else {
+        layer.msg(message, {
+          icon: 2
+        })
+      }
+    })
+
+    $("#updButton").on('click', async () => {
+      const formData = new FormData($("#sysForm")[0])
+      console.log(formData.get('file'));
+      oldPic = pic
+      formData.set('isUpPic', isUpPic)
+      formData.set('oldPic', oldPic)
+      const { code, message } = await $.ajax({
+        url: "/updPic",
+        type: 'post',
+        data: formData,
+        contentType: false,
+        processData: false
       })
-    });
+      if (code == 0) {
+        let logImg = JSON.parse(Cookies.get('logoPic'));
+        $('#LogoPic').attr('src', `upload/${logImg}`);
+        layer.msg(message, { icon: 1})
+      } else {
+        layer.msg(message, { icon: 0 })
+      }
+      })
+  });
+
 </script>

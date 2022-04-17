@@ -1,6 +1,4 @@
 const express = require('express');
-const app = express();
-const path = require('path');
 var router = express.Router();
 const multer = require('multer');   
 
@@ -63,9 +61,7 @@ router.get('/getCount',classifyController.getCount);
 router.get('/system',sysController.system)
 router.get('/sysData',sysController.sysData)
 router.post('/updSysData', sysController.updSysData)
+router.post('/updPic', sysController.updPic)
 router.get('/delSysData', sysController.delSysData)
-
-
-
 
 module.exports = router

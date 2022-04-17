@@ -7,6 +7,7 @@
   <title>德德后台管理系统</title>
   <link rel="stylesheet" href="./assets/layui/css/layui.css">
 </head>
+
 <body>
   <div class="layui-layout layui-layout-admin">
     {{include "./common/header.html" }}
@@ -18,7 +19,7 @@
           <table class="layui-table" id="cate" lay-filter="cate">
         </div>
       </div>
-      <div style="margin-left: 30px;">
+      <div>
         <h3 style="margin-bottom: 10px;">主题换肤</h3>
         <form class="layui-form" action="" id="formColor">
           <div class="layui-form-item">
@@ -31,12 +32,40 @@
           </div>
         </form>
       </div>
-
+      <form id="sysForm">
+        <div class="layui-form-item">
+          <!-- <label class="layui-form-label">封面图</label> -->
+          <div class="layui-input-inline" style="display: flex;">
+            <input type="file" name="file" id="pic" onchange="uploadFile(this)" style="display:none">
+            <div class="layui-upload-drag" style="width: 100px;" href="javascript:;" id="upload"><i
+                class="layui-icon"></i>
+              <div>上传logo图</div>
+            </div>
+            <img src="" id="preview" alt="" style="width: 150px">
+          </div>
+        </div>
+        <button style="margin-left: 20px;" type="button" class="layui-btn" lay-submit id="updButton">点击提交</button>
+      </form>
     </div>
   </div>
   <script src="./assets/layui/layui.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
   <script>
+    let isUpPic = 0
+
+    // 上传文件
+    function uploadFile(fileEle) {
+      const file = fileEle.files[0];
+      // 预览图片
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(file)
+      fileReader.onload = function () {
+        const base64 = this.result
+        $("#preview").attr('src', base64)
+      }
+      isUpPic=1
+    }
+
     layui.use(['table', 'form', 'colorpicker'], function () {
       var table = layui.table;
       var form = layui.form;
@@ -96,8 +125,15 @@
         , done: function (color) {
           $('#test-form-input').val(color);
           Cookies.set('colors', color, { expires: 365 })
+          location.reload()
           console.log(color);
         }
       });
+
+      // 上传文件
+      $("#upload").on('click', () => {
+        $("#pic")[0].click();
+      })
+
     });
   </script>
